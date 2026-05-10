@@ -4,7 +4,7 @@ export default defineConfig({
   input: "../technicallycorrect.io/openapi.json",
   output: {
     path: "src/client",
-    format: "prettier",
+    postProcess: ["prettier"],
   },
   plugins: ["@hey-api/client-fetch"],
 });
