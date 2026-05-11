@@ -40,8 +40,17 @@
 | 5.2.2     | Display task result with affected implementations when awaiting_review with impacts | -      | -      |
 | **6.0**   | **Projects**                                                                |        |        |
 | 6.1       | `tc p list` lists all projects for an organization                          | -      | -      |
-| **7.0**   | **CLI Interface**                                                           |        |        |
-| 7.1       | Read project slug from configuration when not provided as argument          | -      | -      |
-| 7.2       | Output all responses as JSON                                                | -      | -      |
-| 7.3       | Display error identifying missing required configuration value              | -      | -      |
-| 7.4       | Display API error and exit non-zero on API failure                          | -      | -      |
+| **7.0**   | **Init**                                                                    |        |        |
+| 7.1       | `tc init` injects usage instructions into AI config files in current directory | -      | -      |
+| 7.2       | Search and update AGENTS.md, CLAUDE.md, .cursor/rules/, .windsurf/rules/   | -      | -      |
+| 7.3       | Display error and exit if no supported files exist                          | -      | -      |
+| 7.4       | Delimit injected content with <!-- Technically Correct CLI --> tags         | -      | -      |
+| 7.5       | Injected content describes when to use each command and how to access help  | -      | -      |
+| 7.6       | -g flag updates global AI config files instead of project-level files      | -      | -      |
+| 7.6.1     | Global files in platform home dir: .claude/CLAUDE.md, .cursor/rules/, .windsurf/rules/ | -      | -      |
+| 7.6.2     | Display error and exit if -g is set and no global files exist               | -      | -      |
+| **8.0**   | **CLI Interface**                                                           |        |        |
+| 8.1       | Read project slug from configuration when not provided as argument          | -      | -      |
+| 8.2       | Output all responses as JSON                                                | -      | -      |
+| 8.3       | Display error identifying missing required configuration value              | -      | -      |
+| 8.4       | Display API error and exit non-zero on API failure                          | -      | -      |
