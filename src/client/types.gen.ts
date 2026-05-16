@@ -175,14 +175,9 @@ export type TechcorWebApiOpenApiControllerSpecResponse =
 
 export type TechcorWebApiOrganizationsControllerShowData = {
   body?: never;
-  path: {
-    /**
-     * Organization slug
-     */
-    org_slug: string;
-  };
+  path?: never;
   query?: never;
-  url: "/api/v1/{org_slug}";
+  url: "/api/v1/org";
 };
 
 export type TechcorWebApiOrganizationsControllerShowErrors = {
@@ -190,10 +185,6 @@ export type TechcorWebApiOrganizationsControllerShowErrors = {
    * Unauthorized
    */
   401: ErrorResponse;
-  /**
-   * Not found
-   */
-  404: ErrorResponse;
 };
 
 export type TechcorWebApiOrganizationsControllerShowError =

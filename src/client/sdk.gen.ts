@@ -84,16 +84,16 @@ export const techcorWebApiOpenApiControllerSpec = <ThrowOnError extends boolean 
 /**
  * Get organization
  *
- * Returns the organization identified by slug.
+ * Returns the organization associated with the bearer token.
  */
 export const techcorWebApiOrganizationsControllerShow = <ThrowOnError extends boolean = false>(
-  options: Options<TechcorWebApiOrganizationsControllerShowData, ThrowOnError>
+  options?: Options<TechcorWebApiOrganizationsControllerShowData, ThrowOnError>
 ) =>
-  (options.client ?? client).get<
+  (options?.client ?? client).get<
     TechcorWebApiOrganizationsControllerShowResponses,
     TechcorWebApiOrganizationsControllerShowErrors,
     ThrowOnError
-  >({ url: "/api/v1/{org_slug}", ...options });
+  >({ url: "/api/v1/org", ...options });
 
 /**
  * List projects
