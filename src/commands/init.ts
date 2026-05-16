@@ -14,20 +14,42 @@ function buildContent(projectSlug?: string): string {
   return `${DELIMITER}
 ## Technically Correct CLI (\`tc\`)
 
-${projectLine}Run \`tc --help\` for full documentation. Run \`tc <command> --help\` for command-specific help.
+${projectLine}
+### Workflow
 
-### When to use each command
+Every feature or change follows this sequence: **requirement → design → implement → link commits**. Do not skip steps or reorder them.
 
-- \`tc r create <text>\` — Create a new requirement before starting work on a feature
-- \`tc r list\` — List all requirements for the current project
-- \`tc r <identifier>\` — Show a requirement with its design and implementations
-- \`tc r edit <identifier> <text>\` — Update a requirement; reviews impact on related requirements
-- \`tc r accept <identifier>\` — Accept a requirement after reviewing impact analysis
-- \`tc d set <identifier> <text>\` — Record a design or implementation plan for a requirement
-- \`tc i add <identifier> <json>\` — Link a git commit to a requirement after committing
-- \`tc t list\` — List active tasks (pending AI pipeline operations)
-- \`tc t <id>\` — Show a task's status and result
-- \`tc t verify <id>\` — Verify a task that is awaiting review
+**1. At the start of every session — read the requirements**
+
+Run \`tc r list\` before doing anything else. Requirements may have been renumbered or updated since the last session. This is your source of truth — do not rely on memory.
+
+**2. Before any planning or coding — create a requirement**
+
+Run \`tc r create <text>\` as soon as the user describes a feature, change, or bug fix. The requirement captures *what* must be true, not *how* to build it. Write it in EARS format using modal verbs: "When X, the system shall Y." Create sub-requirements with \`--parent <identifier>\` when a requirement has distinct parts. Run \`tc r list\` after creating to confirm identifiers and see the updated requirement tree.
+
+**3. Before writing any code — set a design**
+
+Run \`tc d set <identifier> <text>\` after agreeing on an approach with the user but before implementing. The design captures *how* you will satisfy the requirement — architecture decisions, data structures, key functions, edge cases. If the command returns an \`impacted\` list, show it to the user and ask for confirmation before proceeding.
+
+**4. After each commit — link the implementation**
+
+Run \`tc i add <identifier> <json>\` immediately after every \`git commit\` that implements part of a requirement. Do this before moving on. Always include \`description\` explaining what aspect of the requirement this commit addresses — do not rely on the commit message alone as it may be too sparse. The \`repo\`, \`commit_hash\` (short hash), and \`commit_message\` fields are required.
+
+Example: \`tc i add 1.0 '{"repo":"org/repo","commit_hash":"abc1234","commit_message":"feat: add handler","description":"Implements the request validation logic from the design"}'\`
+
+**5. When edit or design returns impacts — review before accepting**
+
+If \`tc r edit\` or \`tc d set\` returns a result with an \`impacted\` list, show it to the user and ask for confirmation before calling \`tc r accept <identifier>\` or \`tc t verify <id>\`. Run \`tc r list\` after accepting to confirm the updated state.
+
+**6. If the user asks you to implement something that conflicts with existing requirements**
+
+You cannot know all conflicts in advance. Trust the impact analysis — if \`tc r edit\` or \`tc d set\` returns impacts, that is the signal to pause. If the user's instruction seems to contradict a requirement you can see in \`tc r list\`, flag it explicitly and ask whether to update the requirement first.
+
+### Other commands
+
+- \`tc r <identifier>\` — Show a single requirement with its design and linked commits
+- \`tc t list\` — List active background tasks
+- \`tc t verify <id>\` — Verify a task awaiting review
 - \`tc p list\` — List all projects in the organization
 - \`tc config\` — View current CLI configuration
 ${DELIMITER}`;
