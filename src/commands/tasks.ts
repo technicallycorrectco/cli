@@ -10,8 +10,8 @@ import { print, fail } from "../output.js";
 export function tasksCommand(): Command {
   const cmd = new Command("t").description("Manage tasks");
 
-  cmd
-    .command("<id>")
+  const showCmd = new Command("show")
+    .argument("<id>")
     .description("Show a single task")
     .option("--project <slug>", "Project slug")
     .action(async (id, options) => {
@@ -23,6 +23,7 @@ export function tasksCommand(): Command {
       if (error) fail((error as { error: string }).error);
       print(data);
     });
+  cmd.addCommand(showCmd, { isDefault: true });
 
   cmd
     .command("list")

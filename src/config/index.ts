@@ -35,5 +35,5 @@ export function saveConfig(values: Partial<Config>): void {
 }
 
 export function getBaseUrl(config: Config): string {
-  return `http://${config.host}:${config.port}/api/v1`;
+  return `http://${config.host}:${config.port}`;
 }

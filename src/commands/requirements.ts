@@ -28,8 +28,8 @@ export function requirementsCommand(): Command {
       print(data);
     });
 
-  cmd
-    .command("<identifier>")
+  const showCmd = new Command("show")
+    .argument("<identifier>")
     .description("Show a single requirement")
     .option("--project <slug>", "Project slug")
     .action(async (identifier, options) => {
@@ -41,6 +41,7 @@ export function requirementsCommand(): Command {
       if (error) fail((error as { error: string }).error);
       print(data);
     });
+  cmd.addCommand(showCmd, { isDefault: true });
 
   cmd
     .command("create <text>")
@@ -59,21 +60,17 @@ export function requirementsCommand(): Command {
       if (error) fail((error as { error: string }).error);
 
       const resolved = await pollTask(org, project, (task as Task).id);
+      const identifier = (resolved.result as { requirement?: { identifier: string } })?.requirement
+        ?.identifier;
 
-      if (resolved.status === "awaiting_review") {
-        const { data: accepted, error: acceptError } =
-          await techcorWebApiRequirementsControllerAccept({
-            path: {
-              org_slug: org,
-              project_slug: project,
-              identifier: (resolved.result as { identifier: string }).identifier,
-            },
-          });
-        if (acceptError) fail((acceptError as { error: string }).error);
-        print(accepted);
-      } else {
-        print(resolved);
-      }
+      if (!identifier) fail("Unexpected task result: missing requirement identifier");
+
+      const { data: accepted, error: acceptError } =
+        await techcorWebApiRequirementsControllerAccept({
+          path: { org_slug: org, project_slug: project, identifier },
+        });
+      if (acceptError) fail((acceptError as { error: string }).error);
+      print(accepted);
     });
 
   cmd
