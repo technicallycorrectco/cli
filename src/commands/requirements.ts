@@ -91,15 +91,11 @@ export function requirementsCommand(): Command {
       const resolved = await pollTask(org, project, (task as Task).id);
 
       if (resolved.status === "awaiting_review") {
-        const impacts = (resolved.result as { impacts?: unknown[] })?.impacts ?? [];
-        if (impacts.length === 0) {
+        const impacted = (resolved.result as { impacted?: unknown[] })?.impacted ?? [];
+        if (impacted.length === 0) {
           const { data: accepted, error: acceptError } =
             await techcorWebApiRequirementsControllerAccept({
-              path: {
-                org_slug: org,
-                project_slug: project,
-                identifier: (resolved.result as { identifier: string }).identifier,
-              },
+              path: { org_slug: org, project_slug: project, identifier },
             });
           if (acceptError) fail((acceptError as { error: string }).error);
           print(accepted);
@@ -107,7 +103,11 @@ export function requirementsCommand(): Command {
           print(resolved);
         }
       } else {
-        print(resolved);
+        const { data: req, error: reqError } = await techcorWebApiRequirementsControllerShow({
+          path: { org_slug: org, project_slug: project, identifier },
+        });
+        if (reqError) fail((reqError as { error: string }).error);
+        print(req);
       }
     });
 

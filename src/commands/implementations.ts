@@ -1,5 +1,8 @@
 import { Command } from "commander";
-import { techcorWebApiImplementationsControllerCreate } from "../client/sdk.gen.js";
+import {
+  techcorWebApiImplementationsControllerCreate,
+  techcorWebApiRequirementsControllerShow,
+} from "../client/sdk.gen.js";
 import { resolveOrgSlug } from "../api/index.js";
 import { print, fail } from "../output.js";
 import type { ImplementationCreate } from "../client/types.gen.js";
@@ -22,12 +25,17 @@ export function implementationsCommand(): Command {
         fail("Invalid JSON argument");
       }
 
-      const { data, error } = await techcorWebApiImplementationsControllerCreate({
+      const { error } = await techcorWebApiImplementationsControllerCreate({
         path: { org_slug: org, project_slug: project, identifier },
         body,
       });
       if (error) fail((error as { error: string }).error);
-      print(data);
+
+      const { data: req, error: reqError } = await techcorWebApiRequirementsControllerShow({
+        path: { org_slug: org, project_slug: project, identifier },
+      });
+      if (reqError) fail((reqError as { error: string }).error);
+      print(req);
     });
 
   return cmd;
