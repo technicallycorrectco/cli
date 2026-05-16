@@ -4,7 +4,7 @@
   "description": "Technically Correct CLI",
   "main": "./dist/index.js",
   "bin": {
-    "tc": "./dist/index.js"
+    "tc": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -23,6 +23,9 @@
   "author": "",
   "license": "ISC",
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "bugs": {
     "url": "https://github.com/technicallycorrectco/cli/issues"
   },
