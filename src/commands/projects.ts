@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { techcorWebApiProjectsControllerIndex } from "../client/sdk.gen.js";
-import { print, fail } from "../output.js";
+import { resolveOrgSlug } from "../api/index.js";
+import { print } from "../output.js";
 
 export function projectsCommand(): Command {
   const cmd = new Command("p").description("Manage projects");
@@ -8,13 +9,12 @@ export function projectsCommand(): Command {
   cmd
     .command("list")
     .description("List all projects")
-    .option("--org <slug>", "Organization slug")
-    .action(async (options) => {
-      const org = options.org ?? fail("--org is required");
+    .action(async () => {
+      const org = await resolveOrgSlug();
       const { data, error } = await techcorWebApiProjectsControllerIndex({
         path: { org_slug: org },
       });
-      if (error) fail((error as { error: string }).error);
+      if (error) console.error(error);
       print(data);
     });
 

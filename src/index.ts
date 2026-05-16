@@ -16,10 +16,10 @@ initClient(config);
 program.name("tc").description("Technically Correct CLI").version("1.0.0");
 
 program.addCommand(configCommand());
-program.addCommand(requirementsCommand(config));
-program.addCommand(tasksCommand(config));
-program.addCommand(implementationsCommand(config));
-program.addCommand(designsCommand(config));
+program.addCommand(requirementsCommand());
+program.addCommand(tasksCommand());
+program.addCommand(implementationsCommand());
+program.addCommand(designsCommand());
 program.addCommand(projectsCommand());
 program.addCommand(initCommand());
 

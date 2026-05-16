@@ -6,10 +6,10 @@
 - **1.2** The CLI shall allow a user to set an API port.
 - **1.3** The CLI shall allow a user to set a bearer token for API authentication.
 - **1.4** The CLI shall store configuration in `~/.technicallycorrect/cli/config.json`.
-- **1.5** The CLI shall allow a user to set a default project slug.
+- **1.5** The CLI shall resolve the organization slug from the API on first use and cache it in the configuration file.
 - **1.6** The CLI shall allow a user to view the current resolved configuration.
 - **1.7** The `tc config` command with no arguments shall display the current resolved configuration (req. 1.6).
-- **1.8** The `tc config` command shall accept `--host`, `--port`, `--api-key`, and `--project` flags to set configuration values.
+- **1.8** The `tc config` command shall accept `--host`, `--port`, and `--api-key` flags to set configuration values.
 
 ## 2.0 The CLI shall allow a user to manage requirements.
 
@@ -52,18 +52,19 @@
 
 ## 7.0 The CLI shall provide an init command to inject usage instructions into AI configuration files.
 
-- **7.1** The `tc init` command shall inject Technically Correct CLI usage instructions into AI configuration files in the current directory.
+- **7.1** The `tc init --project <slug>` command shall inject Technically Correct CLI usage instructions into AI configuration files in the current directory.
 - **7.2** The CLI shall search for and update all of the following files if they exist: `AGENTS.md`, `CLAUDE.md`, and markdown files in `.cursor/rules/` and `.windsurf/rules/`.
 - **7.3** If none of the supported files exist, the CLI shall display an error message and exit without creating any files.
 - **7.4** The injected content shall be delimited by `<!-- Technically Correct CLI -->` comment tags so that subsequent runs of `tc init` update the content in place rather than appending.
-- **7.5** The injected content shall describe when to use each CLI command and how to access help.
+- **7.5** The injected content shall include the project slug and describe when to use each CLI command and how to access help.
 - **7.6** When the `-g` flag is set, the `tc init` command shall update global AI configuration files instead of project-level files.
   - **7.6.1** The global configuration files shall be: `<home>/.claude/CLAUDE.md`, `<home>/.cursor/rules/`, and `<home>/.windsurf/rules/`, where `<home>` is the platform home directory.
   - **7.6.2** When the `-g` flag is set and none of the global files exist, the CLI shall display an error message and exit without creating any files.
+  - **7.6.3** When the `-g` flag is set, the `--project` flag shall not be required.
 
 ## 8.0 The CLI shall provide a consistent command-line interface.
 
-- **8.1** When a project slug is not provided as an argument, the CLI shall read the value from the resolved configuration (req. 1.5).
+- **8.1** All commands that operate on a project shall accept a `--project <slug>` flag to override the project for that invocation.
 - **8.2** The CLI shall output all responses as JSON.
-- **8.3** If a required configuration value is missing, then the CLI shall display an error message that identifies the missing value.
+- **8.3** If a required value is missing, then the CLI shall display an error message that identifies the missing value.
 - **8.4** If the API returns an error, then the CLI shall display the error message and exit with a non-zero status code.

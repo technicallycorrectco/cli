@@ -6,7 +6,7 @@ export type Config = {
   host: string;
   port: number;
   apiKey: string;
-  project: string;
+  orgSlug: string;
 };
 
 const CONFIG_PATH = path.join(os.homedir(), ".technicallycorrect", "cli", "config.json");
@@ -15,7 +15,7 @@ const DEFAULTS: Config = {
   host: "localhost",
   port: 4000,
   apiKey: "",
-  project: "",
+  orgSlug: "",
 };
 
 export function loadConfig(): Config {

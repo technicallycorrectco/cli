@@ -6,22 +6,21 @@ import {
   techcorWebApiRequirementsControllerUpdate,
   techcorWebApiRequirementsControllerAccept,
 } from "../client/sdk.gen.js";
-import type { Config } from "../config/index.js";
+import { resolveOrgSlug } from "../api/index.js";
 import { pollTask } from "../services/poller.js";
 import { print, fail } from "../output.js";
 import type { Task, Requirement } from "../client/types.gen.js";
 
-export function requirementsCommand(config: Config): Command {
+export function requirementsCommand(): Command {
   const cmd = new Command("r").description("Manage requirements");
 
   cmd
     .command("list")
     .description("List all requirements for the project")
-    .option("--org <slug>", "Organization slug")
     .option("--project <slug>", "Project slug")
     .action(async (options) => {
-      const org = options.org ?? fail("--org is required");
-      const project = options.project ?? config.project ?? fail("--project is required");
+      const org = await resolveOrgSlug();
+      const project = options.project ?? fail("--project is required");
       const { data, error } = await techcorWebApiRequirementsControllerIndex({
         path: { org_slug: org, project_slug: project },
       });
@@ -32,11 +31,10 @@ export function requirementsCommand(config: Config): Command {
   cmd
     .command("<identifier>")
     .description("Show a single requirement")
-    .option("--org <slug>", "Organization slug")
     .option("--project <slug>", "Project slug")
     .action(async (identifier, options) => {
-      const org = options.org ?? fail("--org is required");
-      const project = options.project ?? config.project ?? fail("--project is required");
+      const org = await resolveOrgSlug();
+      const project = options.project ?? fail("--project is required");
       const { data, error } = await techcorWebApiRequirementsControllerShow({
         path: { org_slug: org, project_slug: project, identifier },
       });
@@ -47,13 +45,12 @@ export function requirementsCommand(config: Config): Command {
   cmd
     .command("create <text>")
     .description("Create a requirement")
-    .option("--org <slug>", "Organization slug")
     .option("--project <slug>", "Project slug")
     .option("--parent <identifier>", "Parent requirement identifier")
     .option("--context <text>", "Optional context")
     .action(async (text, options) => {
-      const org = options.org ?? fail("--org is required");
-      const project = options.project ?? config.project ?? fail("--project is required");
+      const org = await resolveOrgSlug();
+      const project = options.project ?? fail("--project is required");
 
       const { data: task, error } = await techcorWebApiRequirementsControllerCreate({
         path: { org_slug: org, project_slug: project },
@@ -82,12 +79,11 @@ export function requirementsCommand(config: Config): Command {
   cmd
     .command("edit <identifier> <text>")
     .description("Edit a requirement")
-    .option("--org <slug>", "Organization slug")
     .option("--project <slug>", "Project slug")
     .option("--context <text>", "Optional context")
     .action(async (identifier, text, options) => {
-      const org = options.org ?? fail("--org is required");
-      const project = options.project ?? config.project ?? fail("--project is required");
+      const org = await resolveOrgSlug();
+      const project = options.project ?? fail("--project is required");
 
       const { data: task, error } = await techcorWebApiRequirementsControllerUpdate({
         path: { org_slug: org, project_slug: project, identifier },
@@ -121,11 +117,10 @@ export function requirementsCommand(config: Config): Command {
   cmd
     .command("accept <identifier>")
     .description("Accept a requirement")
-    .option("--org <slug>", "Organization slug")
     .option("--project <slug>", "Project slug")
     .action(async (identifier, options) => {
-      const org = options.org ?? fail("--org is required");
-      const project = options.project ?? config.project ?? fail("--project is required");
+      const org = await resolveOrgSlug();
+      const project = options.project ?? fail("--project is required");
       const { data, error } = await techcorWebApiRequirementsControllerAccept({
         path: { org_slug: org, project_slug: project, identifier },
       });

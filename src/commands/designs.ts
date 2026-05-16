@@ -1,22 +1,23 @@
 import { Command } from "commander";
-import { techcorWebApiDesignControllerUpdate } from "../client/sdk.gen.js";
-import type { Config } from "../config/index.js";
+import {
+  techcorWebApiDesignControllerUpdate,
+  techcorWebApiRequirementsControllerShow,
+} from "../client/sdk.gen.js";
+import { resolveOrgSlug } from "../api/index.js";
 import { pollTask } from "../services/poller.js";
 import { print, fail } from "../output.js";
 import type { Task } from "../client/types.gen.js";
-import { techcorWebApiRequirementsControllerShow } from "../client/sdk.gen.js";
 
-export function designsCommand(config: Config): Command {
+export function designsCommand(): Command {
   const cmd = new Command("d").description("Manage designs");
 
   cmd
     .command("set <identifier> <text>")
     .description("Set the design text for a requirement")
-    .option("--org <slug>", "Organization slug")
     .option("--project <slug>", "Project slug")
     .action(async (identifier, text, options) => {
-      const org = options.org ?? fail("--org is required");
-      const project = options.project ?? config.project ?? fail("--project is required");
+      const org = await resolveOrgSlug();
+      const project = options.project ?? fail("--project is required");
 
       const { data: task, error } = await techcorWebApiDesignControllerUpdate({
         path: { org_slug: org, project_slug: project, identifier },

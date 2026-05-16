@@ -4,13 +4,17 @@ import path from "path";
 import os from "os";
 import { fail } from "../output.js";
 
-const DELIMITER_START = "<!-- Technically Correct CLI -->";
-const DELIMITER_END = "<!-- Technically Correct CLI -->";
+const DELIMITER = "<!-- Technically Correct CLI -->";
 
-const CONTENT = `${DELIMITER_START}
+function buildContent(projectSlug?: string): string {
+  const projectLine = projectSlug
+    ? `**Project:** \`${projectSlug}\` — pass \`--project ${projectSlug}\` on all commands.\n\n`
+    : "";
+
+  return `${DELIMITER}
 ## Technically Correct CLI (\`tc\`)
 
-Run \`tc --help\` for full documentation. Run \`tc <command> --help\` for command-specific help.
+${projectLine}Run \`tc --help\` for full documentation. Run \`tc <command> --help\` for command-specific help.
 
 ### When to use each command
 
@@ -26,18 +30,23 @@ Run \`tc --help\` for full documentation. Run \`tc <command> --help\` for comman
 - \`tc t verify <id>\` — Verify a task that is awaiting review
 - \`tc p list\` — List all projects in the organization
 - \`tc config\` — View current CLI configuration
-${DELIMITER_END}`;
+${DELIMITER}`;
+}
 
-function injectContent(filePath: string): void {
+function injectContent(filePath: string, projectSlug?: string): void {
   const existing = fs.readFileSync(filePath, "utf-8");
-  const startIdx = existing.indexOf(DELIMITER_START);
-  const endIdx = existing.indexOf(DELIMITER_END, startIdx + DELIMITER_START.length);
+  const content = buildContent(projectSlug);
+  const startIdx = existing.indexOf(DELIMITER);
+  const endIdx =
+    startIdx !== -1
+      ? existing.indexOf(DELIMITER, startIdx + DELIMITER.length) + DELIMITER.length
+      : -1;
 
   let updated: string;
-  if (startIdx !== -1 && endIdx !== -1) {
-    updated = existing.slice(0, startIdx) + CONTENT + existing.slice(endIdx + DELIMITER_END.length);
+  if (startIdx !== -1 && endIdx > startIdx) {
+    updated = existing.slice(0, startIdx) + content + existing.slice(endIdx);
   } else {
-    updated = existing.trimEnd() + "\n\n" + CONTENT + "\n";
+    updated = existing.trimEnd() + "\n\n" + content + "\n";
   }
 
   fs.writeFileSync(filePath, updated);
@@ -76,19 +85,26 @@ export function initCommand(): Command {
   return new Command("init")
     .description("Inject CLI usage instructions into AI configuration files")
     .option("-g, --global", "Update global AI configuration files")
+    .option("--project <slug>", "Project slug to include in injected content")
     .action((options) => {
-      const files = options.global ? collectGlobalFiles() : collectFiles(process.cwd());
+      const isGlobal = options.global ?? false;
+
+      if (!isGlobal && !options.project) {
+        fail("--project <slug> is required");
+      }
+
+      const files = isGlobal ? collectGlobalFiles() : collectFiles(process.cwd());
 
       if (files.length === 0) {
         fail(
-          options.global
+          isGlobal
             ? "No global AI configuration files found"
             : "No AI configuration files found in current directory"
         );
       }
 
       for (const file of files) {
-        injectContent(file);
+        injectContent(file, isGlobal ? undefined : options.project);
       }
     });
 }

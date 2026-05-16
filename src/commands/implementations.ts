@@ -1,20 +1,19 @@
 import { Command } from "commander";
 import { techcorWebApiImplementationsControllerCreate } from "../client/sdk.gen.js";
-import type { Config } from "../config/index.js";
+import { resolveOrgSlug } from "../api/index.js";
 import { print, fail } from "../output.js";
 import type { ImplementationCreate } from "../client/types.gen.js";
 
-export function implementationsCommand(config: Config): Command {
+export function implementationsCommand(): Command {
   const cmd = new Command("i").description("Manage implementations");
 
   cmd
     .command("add <identifier> <json>")
     .description("Link a git commit to a requirement")
-    .option("--org <slug>", "Organization slug")
     .option("--project <slug>", "Project slug")
     .action(async (identifier, json, options) => {
-      const org = options.org ?? fail("--org is required");
-      const project = options.project ?? config.project ?? fail("--project is required");
+      const org = await resolveOrgSlug();
+      const project = options.project ?? fail("--project is required");
 
       let body: ImplementationCreate;
       try {
