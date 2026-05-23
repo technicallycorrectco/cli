@@ -33,11 +33,11 @@ initClient(config);
 program.name("tc").description("Technically Correct CLI").version(version, "-v, --version");
 
 program.addCommand(configCommand());
+program.addCommand(initCommand());
 program.addCommand(requirementsCommand());
 program.addCommand(tasksCommand());
 program.addCommand(implementationsCommand());
 program.addCommand(designsCommand());
 program.addCommand(projectsCommand());
-program.addCommand(initCommand());
 
 program.parse();
