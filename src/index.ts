@@ -30,7 +30,7 @@ if (!skipConfigCheck && !isConfigured(config)) {
 
 initClient(config);
 
-program.name("tc").description("Technically Correct CLI").version(version);
+program.name("tc").description("Technically Correct CLI").version(version, "-v, --version");
 
 program.addCommand(configCommand());
 program.addCommand(requirementsCommand());
