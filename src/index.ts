@@ -18,11 +18,10 @@ const config = loadConfig();
 const subcommand = process.argv[2];
 const skipConfigCheck =
   !subcommand ||
+  subcommand.startsWith("-") ||
   subcommand === "config" ||
   subcommand === "init" ||
-  subcommand === "help" ||
-  subcommand === "--help" ||
-  subcommand === "-h";
+  subcommand === "help";
 
 if (!skipConfigCheck && !isConfigured(config)) {
   console.error("tc is not configured. Run `tc config` to set your API key");
