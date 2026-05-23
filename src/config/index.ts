@@ -37,3 +37,7 @@ export function saveConfig(values: Partial<Config>): void {
 export function getBaseUrl(config: Config): string {
   return `http://${config.host}:${config.port}`;
 }
+
+export function isConfigured(config: Config): boolean {
+  return !!config.apiKey && !!config.orgSlug;
+}
