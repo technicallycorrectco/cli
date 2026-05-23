@@ -2,13 +2,16 @@ import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { techcorWebApiProjectsControllerIndex } from "../client/sdk.gen.js";
+import { resolveOrgSlug } from "../api/index.js";
 import { fail } from "../output.js";
 
 const DELIMITER = "<!-- Technically Correct CLI -->";
 
 function buildContent(projectSlug?: string): string {
+  const slug = projectSlug ?? "<project-slug>";
   const projectLine = projectSlug
-    ? `**Project:** \`${projectSlug}\` — pass \`--project ${projectSlug}\` on all commands.\n\n`
+    ? `**Project:** \`${slug}\` — pass \`--project ${slug}\` on all commands.\n\n`
     : "";
 
   return `${DELIMITER}
@@ -21,35 +24,35 @@ Every feature or change follows this sequence: **requirement → design → impl
 
 **1. At the start of every session — read the requirements**
 
-Run \`tc r list\` before doing anything else. Requirements may have been renumbered or updated since the last session. This is your source of truth — do not rely on memory.
+Run \`tc r list --project ${slug}\` before doing anything else. Requirements may have been renumbered or updated since the last session. This is your source of truth — do not rely on memory.
 
 **2. Before any planning or coding — create a requirement**
 
-Run \`tc r create <text>\` as soon as the user describes a feature, change, or bug fix. The requirement captures *what* must be true, not *how* to build it. Write it in EARS format using modal verbs: "When X, the system shall Y." Create sub-requirements with \`--parent <identifier>\` when a requirement has distinct parts. Run \`tc r list\` after creating to confirm identifiers and see the updated requirement tree.
+Run \`tc r create <text> --project ${slug}\` as soon as the user describes a feature, change, or bug fix. The requirement captures *what* must be true, not *how* to build it. Write it in EARS format using modal verbs: "When X, the system shall Y." Create sub-requirements with \`--parent <identifier>\` when a requirement has distinct parts. Run \`tc r list --project ${slug}\` after creating to confirm identifiers and see the updated requirement tree.
 
 **3. Before writing any code — set a design**
 
-Run \`tc d set <identifier> <text>\` after agreeing on an approach with the user but before implementing. The design captures *how* you will satisfy the requirement — architecture decisions, data structures, key functions, edge cases. If the command returns an \`impacted\` list, show it to the user and ask for confirmation before proceeding.
+Run \`tc d set <identifier> <text> --project ${slug}\` after agreeing on an approach with the user but before implementing. The design captures *how* you will satisfy the requirement — architecture decisions, data structures, key functions, edge cases. If the command returns an \`impacted\` list, show it to the user and ask for confirmation before proceeding.
 
 **4. After each commit — link the implementation**
 
-Run \`tc i add <identifier> <json>\` immediately after every \`git commit\` that implements part of a requirement. Do this before moving on. Always include \`description\` explaining what aspect of the requirement this commit addresses — do not rely on the commit message alone as it may be too sparse. The \`repo\`, \`commit_hash\` (short hash), and \`commit_message\` fields are required.
+Run \`tc i add <identifier> <json> --project ${slug}\` immediately after every \`git commit\` that implements part of a requirement. Do this before moving on. Always include \`description\` explaining what aspect of the requirement this commit addresses — do not rely on the commit message alone as it may be too sparse. The \`repo\`, \`commit_hash\` (short hash), and \`commit_message\` fields are required.
 
-Example: \`tc i add 1.0 '{"repo":"org/repo","commit_hash":"abc1234","commit_message":"feat: add handler","description":"Implements the request validation logic from the design"}'\`
+Example: \`tc i add 1.0 '{"repo":"org/repo","commit_hash":"abc1234","commit_message":"feat: add handler","description":"Implements the request validation logic from the design"}' --project ${slug}\`
 
 **5. When edit or design returns impacts — review before accepting**
 
-If \`tc r edit\` or \`tc d set\` returns a result with an \`impacted\` list, show it to the user and ask for confirmation before calling \`tc r accept <identifier>\` or \`tc t verify <id>\`. Run \`tc r list\` after accepting to confirm the updated state.
+If \`tc r edit\` or \`tc d set\` returns a result with an \`impacted\` list, show it to the user and ask for confirmation before calling \`tc r accept <identifier> --project ${slug}\` or \`tc t verify <id> --project ${slug}\`. Run \`tc r list --project ${slug}\` after accepting to confirm the updated state.
 
 **6. If the user asks you to implement something that conflicts with existing requirements**
 
-You cannot know all conflicts in advance. Trust the impact analysis — if \`tc r edit\` or \`tc d set\` returns impacts, that is the signal to pause. If the user's instruction seems to contradict a requirement you can see in \`tc r list\`, flag it explicitly and ask whether to update the requirement first.
+You cannot know all conflicts in advance. Trust the impact analysis — if \`tc r edit\` or \`tc d set\` returns impacts, that is the signal to pause. If the user's instruction seems to contradict a requirement you can see in \`tc r list --project ${slug}\`, flag it explicitly and ask whether to update the requirement first.
 
 ### Other commands
 
-- \`tc r <identifier>\` — Show a single requirement with its design and linked commits
-- \`tc t list\` — List active background tasks
-- \`tc t verify <id>\` — Verify a task awaiting review
+- \`tc r <identifier> --project ${slug}\` — Show a single requirement with its design and linked commits
+- \`tc t list --project ${slug}\` — List active background tasks
+- \`tc t verify <id> --project ${slug}\` — Verify a task awaiting review
 - \`tc p list\` — List all projects in the organization
 - \`tc config\` — View current CLI configuration
 ${DELIMITER}`;
@@ -106,13 +109,24 @@ function collectGlobalFiles(): string[] {
 export function initCommand(): Command {
   return new Command("init")
     .description("Inject CLI usage instructions into AI configuration files")
+    .argument("[project-slug]", "Project slug to include in injected content")
     .option("-g, --global", "Update global AI configuration files")
-    .option("--project <slug>", "Project slug to include in injected content")
-    .action((options) => {
+    .action(async (projectSlug, options) => {
       const isGlobal = options.global ?? false;
 
-      if (!isGlobal && !options.project) {
-        fail("--project <slug> is required");
+      if (!isGlobal && !projectSlug) {
+        const org = await resolveOrgSlug();
+        const { data, error } = await techcorWebApiProjectsControllerIndex({
+          path: { org_slug: org },
+        });
+        if (error) fail((error as { error: string }).error);
+        const projects = (data as { data: { slug: string; name: string }[] })?.data ?? [];
+        if (projects.length === 0) {
+          fail("no projects found — create one at technicallycorrect.io");
+        }
+        console.log(projects.map((p) => p.slug).join("\n"));
+        console.error("\nrun `tc init <project-slug>` with one of the above");
+        return;
       }
 
       const files = isGlobal ? collectGlobalFiles() : collectFiles(process.cwd());
@@ -126,7 +140,7 @@ export function initCommand(): Command {
       }
 
       for (const file of files) {
-        injectContent(file, isGlobal ? undefined : options.project);
+        injectContent(file, isGlobal ? undefined : projectSlug);
       }
     });
 }
