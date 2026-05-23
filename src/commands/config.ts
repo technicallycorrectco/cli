@@ -29,6 +29,8 @@ export function configCommand(): Command {
             );
           }
         }
+
+        return;
       }
 
       print(loadConfig());
