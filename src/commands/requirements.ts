@@ -63,7 +63,7 @@ export function requirementsCommand(): Command {
       const identifier = (resolved.result as { requirement?: { identifier: string } })?.requirement
         ?.identifier;
 
-      if (!identifier) fail("Unexpected task result: missing requirement identifier");
+      if (!identifier) fail("unexpected task result: missing requirement identifier");
 
       const { data: accepted, error: acceptError } =
         await techcorWebApiRequirementsControllerAccept({

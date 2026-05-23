@@ -16,10 +16,16 @@ import { initCommand } from "./commands/init.js";
 const config = loadConfig();
 
 const subcommand = process.argv[2];
-const skipConfigCheck = !subcommand || subcommand === "config" || subcommand === "init";
+const skipConfigCheck =
+  !subcommand ||
+  subcommand === "config" ||
+  subcommand === "init" ||
+  subcommand === "help" ||
+  subcommand === "--help" ||
+  subcommand === "-h";
 
 if (!skipConfigCheck && !isConfigured(config)) {
-  console.error("tc is not configured. Run `tc config` to set your API key and org slug.");
+  console.error("tc is not configured. Run `tc config` to set your API key");
   process.exit(1);
 }
 

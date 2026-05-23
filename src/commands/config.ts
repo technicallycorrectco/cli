@@ -25,7 +25,7 @@ export function configCommand(): Command {
             await resolveOrgSlug();
           } catch {
             console.error(
-              "Warning: could not resolve org slug from API key. Check your key and host."
+              "warning: could not resolve org slug from API key — check your key and host"
             );
           }
         }

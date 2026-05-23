@@ -72,7 +72,7 @@ function injectContent(filePath: string, projectSlug?: string): void {
   }
 
   fs.writeFileSync(filePath, updated);
-  console.error(`Updated ${filePath}`);
+  console.error(`updated ${filePath}`);
 }
 
 function findMarkdownFiles(dir: string): string[] {
@@ -120,8 +120,8 @@ export function initCommand(): Command {
       if (files.length === 0) {
         fail(
           isGlobal
-            ? "No global AI configuration files found"
-            : "No AI configuration files found in current directory"
+            ? "no global AI configuration files found"
+            : "no AI configuration files found in current directory"
         );
       }
 

@@ -22,7 +22,7 @@ export function implementationsCommand(): Command {
       try {
         body = JSON.parse(json) as ImplementationCreate;
       } catch {
-        fail("Invalid JSON argument");
+        fail("invalid JSON argument");
       }
 
       const { error } = await techcorWebApiImplementationsControllerCreate({
