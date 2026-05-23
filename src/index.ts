@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 import { program } from "commander";
 import { loadConfig, isConfigured } from "./config/index.js";
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { version } = require("../package.json") as { version: string };
 import { initClient } from "./api/index.js";
 import { configCommand } from "./commands/config.js";
 import { requirementsCommand } from "./commands/requirements.js";
@@ -22,7 +25,7 @@ if (!skipConfigCheck && !isConfigured(config)) {
 
 initClient(config);
 
-program.name("tc").description("Technically Correct CLI").version("1.0.0");
+program.name("tc").description("Technically Correct CLI").version(version);
 
 program.addCommand(configCommand());
 program.addCommand(requirementsCommand());
