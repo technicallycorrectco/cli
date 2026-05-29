@@ -19,6 +19,8 @@ npm run precommit   # format → build → lint — run before every commit
 npm link            # Install tc globally for local testing
 ```
 
+When bumping the version (any commit that changes `package.json` version or runs `npm version`), add a new section to `CHANGELOG.md` for that version before committing.
+
 ## Architecture
 
 - **Entry point:** `src/index.ts` — registers all subcommands via Commander and calls `program.parse()`
