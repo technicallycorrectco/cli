@@ -7,7 +7,15 @@ import { resolveOrgSlug } from "../api/index.js";
 import { saveLocalConfig } from "../config/index.js";
 import { fail } from "../output.js";
 
-const DELIMITER = "<!-- Technically Correct CLI -->";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { version } = require("../../package.json") as { version: string };
+
+const DELIMITER_PREFIX = "<!-- Technically Correct CLI";
+const CLOSE_DELIMITER = "<!-- /Technically Correct CLI -->";
+
+function openDelimiter(): string {
+  return `${DELIMITER_PREFIX}: v${version} -->`;
+}
 
 function buildContent(projectSlug?: string): string {
   const slug = projectSlug ?? "<project-slug>";
@@ -15,7 +23,7 @@ function buildContent(projectSlug?: string): string {
     ? `**Project:** \`${slug}\` — pass \`--project ${slug}\` on all commands.\n\n`
     : "";
 
-  return `${DELIMITER}
+  return `${openDelimiter()}
 ## Technically Correct CLI (\`tc\`)
 
 ${projectLine}
@@ -33,21 +41,21 @@ Run \`tc r create <text> --project ${slug}\` as soon as the user describes a fea
 
 **3. Before writing any code — set a design**
 
-Run \`tc d set <identifier> <text> --project ${slug}\` after agreeing on an approach with the user but before implementing. The design captures *how* you will satisfy the requirement — architecture decisions, data structures, key functions, edge cases. If the command returns an \`impacted\` list, show it to the user and ask for confirmation before proceeding.
+Run \`tc r edit <identifier> --design <text> --project ${slug}\` after agreeing on an approach with the user but before implementing. The design captures *how* you will satisfy the requirement — architecture decisions, data structures, key functions, edge cases. If the command returns an \`impacted\` list, show it to the user and ask for confirmation before proceeding.
 
 **4. After each commit — link the implementation**
 
-Run \`tc i add <identifier> <json> --project ${slug}\` immediately after every \`git commit\` that implements part of a requirement. Do this before moving on. Always include \`description\` explaining what aspect of the requirement this commit addresses — do not rely on the commit message alone as it may be too sparse. The \`repo\`, \`commit_hash\` (short hash), and \`commit_message\` fields are required.
+Run \`tc i add <identifier> --repo <repo> --commit <hash> --message <msg> --description <text> --project ${slug}\` immediately after every \`git commit\` that implements part of a requirement. Do this before moving on. Always include \`--description\` explaining what aspect of the requirement this commit addresses — do not rely on the commit message alone as it may be too sparse. \`--repo\`, \`--commit\`, and \`--message\` are required.
 
-Example: \`tc i add 1.0 '{"repo":"org/repo","commit_hash":"abc1234","commit_message":"feat: add handler","description":"Implements the request validation logic from the design"}' --project ${slug}\`
+Example: \`tc i add 1.0 --repo org/repo --commit abc1234 --message "feat: add handler" --description "Implements the request validation logic from the design" --project ${slug}\`
 
-**5. When edit or design returns impacts — review before accepting**
+**5. When edit returns impacts — review before accepting**
 
-If \`tc r edit\` or \`tc d set\` returns a result with an \`impacted\` list, show it to the user and ask for confirmation before calling \`tc r accept <identifier> --project ${slug}\` or \`tc t verify <id> --project ${slug}\`. Run \`tc r list --project ${slug}\` after accepting to confirm the updated state.
+If \`tc r edit\` returns a result with an \`impacted\` list, show it to the user and ask for confirmation before calling \`tc r accept <identifier> --project ${slug}\` or \`tc t verify <id> --project ${slug}\`. Run \`tc r list --project ${slug}\` after accepting to confirm the updated state.
 
 **6. If the user asks you to implement something that conflicts with existing requirements**
 
-You cannot know all conflicts in advance. Trust the impact analysis — if \`tc r edit\` or \`tc d set\` returns impacts, that is the signal to pause. If the user's instruction seems to contradict a requirement you can see in \`tc r list --project ${slug}\`, flag it explicitly and ask whether to update the requirement first.
+You cannot know all conflicts in advance. Trust the impact analysis — if \`tc r edit\` returns impacts, that is the signal to pause. If the user's instruction seems to contradict a requirement you can see in \`tc r list --project ${slug}\`, flag it explicitly and ask whether to update the requirement first.
 
 ### Other commands
 
@@ -56,16 +64,16 @@ You cannot know all conflicts in advance. Trust the impact analysis — if \`tc 
 - \`tc t verify <id> --project ${slug}\` — Verify a task awaiting review
 - \`tc p list\` — List all projects in the organization
 - \`tc config\` — View current CLI configuration
-${DELIMITER}`;
+${CLOSE_DELIMITER}`;
 }
 
 function injectContent(filePath: string, projectSlug?: string): void {
   const existing = fs.readFileSync(filePath, "utf-8");
   const content = buildContent(projectSlug);
-  const startIdx = existing.indexOf(DELIMITER);
+  const startIdx = existing.indexOf(DELIMITER_PREFIX);
   const endIdx =
     startIdx !== -1
-      ? existing.indexOf(DELIMITER, startIdx + DELIMITER.length) + DELIMITER.length
+      ? existing.indexOf(CLOSE_DELIMITER, startIdx) + CLOSE_DELIMITER.length
       : -1;
 
   let updated: string;
@@ -105,6 +113,33 @@ function collectGlobalFiles(): string[] {
     ...findMarkdownFiles(path.join(home, ".windsurf", "rules")),
   ];
   return candidates.filter((f) => fs.existsSync(f));
+}
+
+function extractInjectedVersion(content: string): string | null {
+  const match = content.match(/<!-- Technically Correct CLI: v([\d.]+) -->/);
+  return match ? match[1] : null;
+}
+
+export function collectAllFiles(): string[] {
+  return [...collectFiles(process.cwd()), ...collectGlobalFiles()];
+}
+
+export function checkStaleness(files: string[]): void {
+  for (const filePath of files) {
+    try {
+      const content = fs.readFileSync(filePath, "utf-8");
+      if (!content.includes(DELIMITER_PREFIX)) continue;
+      const injectedVersion = extractInjectedVersion(content);
+      if (!injectedVersion || injectedVersion !== version) {
+        const from = injectedVersion ? `v${injectedVersion}` : "an older version";
+        console.error(
+          `warning: tc init content in ${path.basename(filePath)} is outdated (${from} → v${version}). Run \`tc init\` to refresh.`
+        );
+      }
+    } catch {
+      // file unreadable — skip
+    }
+  }
 }
 
 export function initCommand(): Command {

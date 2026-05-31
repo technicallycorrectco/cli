@@ -10,7 +10,7 @@ import { requirementsCommand } from "./commands/requirements.js";
 import { tasksCommand } from "./commands/tasks.js";
 import { implementationsCommand } from "./commands/implementations.js";
 import { projectsCommand } from "./commands/projects.js";
-import { initCommand } from "./commands/init.js";
+import { initCommand, checkStaleness, collectAllFiles } from "./commands/init.js";
 
 const config = loadConfig();
 
@@ -28,6 +28,10 @@ if (!skipConfigCheck && !isConfigured(config)) {
 }
 
 initClient(config);
+
+if (!skipConfigCheck) {
+  checkStaleness(collectAllFiles());
+}
 
 program.name("tc").description("Technically Correct CLI").version(version, "-v, --version");
 
