@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.2]
+
+- Updated README to reflect v2.x changes (named flags, local settings, tree view, staleness warning)
+
 ## [2.1.1]
 
 - Help is now available for all subcommands (`tc r --help`, `tc t --help`, etc.) without requiring `tc config`
