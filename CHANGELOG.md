@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.3]
+
+- Fixed `tc init` duplicating injected content when updating files that used the old-format delimiter
+
 ## [2.1.2]
 
 - Updated README to reflect v2.x changes (named flags, local settings, tree view, staleness warning)

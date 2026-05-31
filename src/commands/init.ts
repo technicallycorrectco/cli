@@ -71,13 +71,11 @@ function injectContent(filePath: string, projectSlug?: string): void {
   const existing = fs.readFileSync(filePath, "utf-8");
   const content = buildContent(projectSlug);
   const startIdx = existing.indexOf(DELIMITER_PREFIX);
-  const endIdx =
-    startIdx !== -1
-      ? existing.indexOf(CLOSE_DELIMITER, startIdx) + CLOSE_DELIMITER.length
-      : -1;
+  const closeIdx = startIdx !== -1 ? existing.indexOf(CLOSE_DELIMITER, startIdx) : -1;
+  const endIdx = closeIdx !== -1 ? closeIdx + CLOSE_DELIMITER.length : -1;
 
   let updated: string;
-  if (startIdx !== -1 && endIdx > startIdx) {
+  if (startIdx !== -1 && endIdx !== -1) {
     updated = existing.slice(0, startIdx) + content + existing.slice(endIdx);
   } else {
     updated = existing.trimEnd() + "\n\n" + content + "\n";
