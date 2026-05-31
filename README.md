@@ -15,44 +15,54 @@ tc config --host localhost --port 4000 --api-key <your-api-key>
 tc config  # view current configuration
 ```
 
-Configuration is stored at `~/.technicallycorrect/cli/config.json`. The organization is resolved automatically from your API key on first use.
+Configuration is stored at `~/.technicallycorrect/settings.json`. The organization is resolved automatically from your API key on first use.
+
+## Project setup
+
+Run `tc init` in your repository to inject usage instructions into your AI assistant's config files and set the default project for that directory:
+
+```bash
+tc init <slug>   # updates AGENTS.md, CLAUDE.md, .cursor/rules/, .windsurf/rules/
+                 # and writes .technicallycorrect/settings.json with the project slug
+tc init -g       # updates global AI config files (~/.claude/CLAUDE.md, etc.)
+```
+
+Once initialised, `--project` is optional on all commands — it is resolved from the local `.technicallycorrect/settings.json` (or global settings) automatically.
 
 ## Commands
 
 ### Requirements
 
 ```bash
-tc r list --project <slug>                        # list all requirements
-tc r <identifier> --project <slug>                # show a requirement with design and implementations
-tc r create <text> --project <slug>               # create a requirement (async, auto-accepts)
-tc r edit <identifier> <text> --project <slug>    # edit a requirement (async, shows impact analysis)
-tc r accept <identifier> --project <slug>         # accept a requirement after reviewing impacts
-```
-
-### Designs
-
-```bash
-tc d set <identifier> <text> --project <slug>     # set the design for a requirement (async)
+tc r list --project <slug>                         # list all requirements
+tc r list --project <slug> --tree                  # nested tree view
+tc r list --project <slug> --tree --root 2.0       # subtree rooted at 2.0
+tc r <identifier> --project <slug>                 # show a requirement
+tc r <identifier> --project <slug> --include-children  # inline child requirements
+tc r create <text> --project <slug>                # create a requirement (async, auto-accepts)
+tc r edit <identifier> --project <slug>            # edit a requirement — at least one of:
+  --parent <identifier>                            #   move to a new parent (0.0 = root)
+  --design <text>                                  #   set the design text
+  [text]                                           #   update the requirement text (async, shows impact analysis)
+  --context <text>                                 #   update the context / why
+tc r accept <identifier> --project <slug>          # accept after reviewing impacts
 ```
 
 ### Implementations
 
 ```bash
-tc i add <identifier> <json> --project <slug>     # link a git commit to a requirement
+tc i add <identifier> --repo <repo> --commit <hash> --message <msg> --project <slug>
+tc i add <identifier> --repo <repo> --commit <hash> --message <msg> --description <text> --project <slug>
 ```
 
-The JSON argument must include `repo`, `commit_hash`, and `commit_message`. `description` is optional:
-
-```bash
-tc i add 1.0 '{"repo":"my-repo","commit_hash":"abc123","commit_message":"fix: update handler"}' --project <slug>
-```
+Links a git commit to a requirement. `--repo`, `--commit`, and `--message` are required. `--description` is optional but recommended.
 
 ### Tasks
 
 ```bash
-tc t list --project <slug>     # list active tasks
-tc t <id> --project <slug>     # show a task's status and result
-tc t verify <id> --project <slug>  # verify a task awaiting review
+tc t list --project <slug>          # list active tasks
+tc t <id> --project <slug>          # show a task's status and result
+tc t verify <id> --project <slug>   # verify a task awaiting review
 ```
 
 ### Projects
@@ -61,15 +71,14 @@ tc t verify <id> --project <slug>  # verify a task awaiting review
 tc p list    # list all projects in your organization
 ```
 
-### Init
-
-Inject CLI usage instructions into your AI assistant's configuration files so it knows how to use `tc` in the current project:
-
-```bash
-tc init --project <slug>   # updates AGENTS.md, CLAUDE.md, .cursor/rules/, .windsurf/rules/
-tc init -g                 # updates global AI config files (~/.claude/CLAUDE.md, etc.)
-```
-
 ## Async operations
 
-`tc r create`, `tc r edit`, and `tc d set` are asynchronous — the CLI polls until the operation completes and returns the final result. For edits and designs, if the AI detects impact on related requirements or implementations, the result is returned for review without auto-accepting.
+`tc r create` and `tc r edit` (when text is provided) are asynchronous — the CLI polls until the operation completes and returns the final result. If the AI detects impact on related requirements, the result is returned for review without auto-accepting.
+
+## Stale AI config warning
+
+When the CLI is updated, injected content in `AGENTS.md`, `CLAUDE.md`, and other AI config files may be outdated. On each invocation, `tc` checks for stale content and prints a warning to stderr if a refresh is needed:
+
+```
+warning: tc init content in CLAUDE.md is outdated (v2.0.0 → v2.1.0). Run `tc init` to refresh.
+```
