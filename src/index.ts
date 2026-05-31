@@ -15,12 +15,16 @@ import { initCommand, checkStaleness, collectAllFiles } from "./commands/init.js
 const config = loadConfig();
 
 const subcommand = process.argv[2];
+const args = process.argv.slice(2);
 const skipConfigCheck =
   !subcommand ||
-  subcommand.startsWith("-") ||
   subcommand === "config" ||
   subcommand === "init" ||
-  subcommand === "help";
+  subcommand === "help" ||
+  args.includes("--help") ||
+  args.includes("-h") ||
+  args.includes("-v") ||
+  args.includes("--version");
 
 if (!skipConfigCheck && !isConfigured(config)) {
   console.error("tc is not configured. Run `tc config` to set your API key");
