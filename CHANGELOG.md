@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.4]
+
+- `tc r list --tree` now excludes rejected requirements from the tree output
+
 ## [2.1.3]
 
 - Fixed `tc init` duplicating injected content when updating files that used the old-format delimiter

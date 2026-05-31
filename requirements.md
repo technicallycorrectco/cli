@@ -19,6 +19,7 @@
 - **2.1** The `tc r list` command shall list all requirements for a project.
   - **2.1.1** When `--tree` is passed, the CLI shall restructure the flat list into a nested JSON tree using identifier depth.
   - **2.1.2** When `--root <identifier>` is passed with `--tree`, the CLI shall filter the tree to the subtree rooted at that identifier.
+  - **2.1.3** When `--tree` is passed, the CLI shall exclude requirements with status `rejected` from the tree output.
 - **2.2** The `tc r <identifier>` command shall show a single requirement by identifier.
   - **2.2.1** When `--include-children` is passed, the CLI shall resolve each child URL in parallel and inline the child objects under a `children` key.
 - **2.3** The `tc r create <text>` command shall create a requirement for a project.

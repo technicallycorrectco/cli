@@ -17,11 +17,12 @@ type ReqNode = { identifier: string; text: string; status: string; children: Req
 
 function buildTree(items: Requirement[], root?: string): ReqNode[] {
   const nodes = new Map<string, ReqNode>();
+  const active = items.filter((r) => r.status !== "rejected");
   const filtered = root
-    ? items.filter(
+    ? active.filter(
         (r) => r.identifier === root || r.identifier.startsWith(root.replace(/\.0$/, "") + ".")
       )
-    : items;
+    : active;
 
   for (const r of filtered) {
     nodes.set(r.identifier, { identifier: r.identifier, text: r.text ?? "", status: r.status ?? "", children: [] });
