@@ -196,7 +196,7 @@ export const techcorWebApiRequirementsControllerShow = <ThrowOnError extends boo
 /**
  * Edit requirement
  *
- * Edits a requirement and enqueues the AI pipeline. Returns a task to poll.
+ * Edits a requirement's text and/or parent. Text changes enqueue the AI pipeline. Parent changes are synchronous and return the updated requirement. At least one of `text` or `parent_identifier` is required.
  */
 export const techcorWebApiRequirementsControllerUpdate = <ThrowOnError extends boolean = false>(
   options: Options<TechcorWebApiRequirementsControllerUpdateData, ThrowOnError>

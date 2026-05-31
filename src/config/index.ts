@@ -7,9 +7,15 @@ export type Config = {
   port: number;
   apiKey: string;
   orgSlug: string;
+  project?: string;
 };
 
-const CONFIG_PATH = path.join(os.homedir(), ".technicallycorrect", "cli", "config.json");
+type SettingsFile = {
+  cli?: Partial<Config>;
+};
+
+const GLOBAL_SETTINGS_PATH = path.join(os.homedir(), ".technicallycorrect", "settings.json");
+const LOCAL_SETTINGS_FILE = path.join(".technicallycorrect", "settings.json");
 
 const DEFAULTS: Config = {
   host: "localhost",
@@ -18,20 +24,57 @@ const DEFAULTS: Config = {
   orgSlug: "",
 };
 
-export function loadConfig(): Config {
+function readSettingsFile(filePath: string): Partial<Config> {
   try {
-    const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
-    return { ...DEFAULTS, ...JSON.parse(raw) };
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const parsed = JSON.parse(raw) as SettingsFile;
+    return parsed.cli ?? {};
   } catch {
-    return { ...DEFAULTS };
+    return {};
   }
 }
 
+function findLocalSettingsPath(): string | null {
+  let dir = process.cwd();
+  while (true) {
+    const candidate = path.join(dir, LOCAL_SETTINGS_FILE);
+    if (fs.existsSync(candidate)) return candidate;
+    const parent = path.dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+}
+
+export function loadConfig(): Config {
+  const global = readSettingsFile(GLOBAL_SETTINGS_PATH);
+  const localPath = findLocalSettingsPath();
+  const local = localPath ? readSettingsFile(localPath) : {};
+  return { ...DEFAULTS, ...global, ...local };
+}
+
 export function saveConfig(values: Partial<Config>): void {
-  const current = loadConfig();
+  const current = readSettingsFile(GLOBAL_SETTINGS_PATH);
   const updated = { ...current, ...values };
-  fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(updated, null, 2));
+  const settings: SettingsFile = { cli: updated };
+  fs.mkdirSync(path.dirname(GLOBAL_SETTINGS_PATH), { recursive: true });
+  fs.writeFileSync(GLOBAL_SETTINGS_PATH, JSON.stringify(settings, null, 2));
+}
+
+export function saveLocalConfig(dir: string, values: Partial<Config>): void {
+  const filePath = path.join(dir, LOCAL_SETTINGS_FILE);
+  const current = readSettingsFile(filePath);
+  const updated = { ...current, ...values };
+  const settings: SettingsFile = { cli: updated };
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify(settings, null, 2));
+}
+
+export function resolveProject(flagValue: string | undefined): string {
+  if (flagValue) return flagValue;
+  const config = loadConfig();
+  if (config.project) return config.project;
+  console.error(JSON.stringify({ error: "--project is required" }, null, 2));
+  process.exit(1);
 }
 
 export function getBaseUrl(config: Config): string {

@@ -4,6 +4,7 @@ import path from "path";
 import os from "os";
 import { techcorWebApiProjectsControllerIndex } from "../client/sdk.gen.js";
 import { resolveOrgSlug } from "../api/index.js";
+import { saveLocalConfig } from "../config/index.js";
 import { fail } from "../output.js";
 
 const DELIMITER = "<!-- Technically Correct CLI -->";
@@ -127,6 +128,10 @@ export function initCommand(): Command {
         console.log(projects.map((p) => p.slug).join("\n"));
         console.error("\nrun `tc init <project-slug>` with one of the above");
         return;
+      }
+
+      if (!isGlobal && projectSlug) {
+        saveLocalConfig(process.cwd(), { project: projectSlug });
       }
 
       const files = isGlobal ? collectGlobalFiles() : collectFiles(process.cwd());

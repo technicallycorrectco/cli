@@ -9,7 +9,6 @@ import { configCommand } from "./commands/config.js";
 import { requirementsCommand } from "./commands/requirements.js";
 import { tasksCommand } from "./commands/tasks.js";
 import { implementationsCommand } from "./commands/implementations.js";
-import { designsCommand } from "./commands/designs.js";
 import { projectsCommand } from "./commands/projects.js";
 import { initCommand } from "./commands/init.js";
 
@@ -37,7 +36,6 @@ program.addCommand(initCommand());
 program.addCommand(requirementsCommand());
 program.addCommand(tasksCommand());
 program.addCommand(implementationsCommand());
-program.addCommand(designsCommand());
 program.addCommand(projectsCommand());
 
 program.parse();

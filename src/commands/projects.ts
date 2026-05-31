@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { techcorWebApiProjectsControllerIndex } from "../client/sdk.gen.js";
 import { resolveOrgSlug } from "../api/index.js";
-import { print } from "../output.js";
+import { printList } from "../output.js";
 
 export function projectsCommand(): Command {
   const cmd = new Command("p").description("Manage projects");
@@ -15,7 +15,7 @@ export function projectsCommand(): Command {
         path: { org_slug: org },
       });
       if (error) console.error(error);
-      print(data);
+      printList(data);
     });
 
   return cmd;

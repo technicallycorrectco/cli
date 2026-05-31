@@ -126,10 +126,16 @@ export type RequirementList = {
 
 /**
  * RequirementUpdate
+ *
+ * At least one of `text` or `parent_identifier` is required. `parent_identifier` may be "0.0" to move the requirement to the root level.
  */
 export type RequirementUpdate = {
   context?: string | null;
-  text: string;
+  /**
+   * Move to a new parent. Use the parent requirement's identifier (e.g. "3.0") or "0.0" for root.
+   */
+  parent_identifier?: string;
+  text?: string;
 };
 
 /**
@@ -492,6 +498,10 @@ export type TechcorWebApiRequirementsControllerUpdateError =
   TechcorWebApiRequirementsControllerUpdateErrors[keyof TechcorWebApiRequirementsControllerUpdateErrors];
 
 export type TechcorWebApiRequirementsControllerUpdateResponses = {
+  /**
+   * Requirement
+   */
+  200: Requirement;
   /**
    * Task
    */
