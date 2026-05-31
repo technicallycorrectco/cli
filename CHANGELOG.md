@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.1.1]
+
+- Help is now available for all subcommands (`tc r --help`, `tc t --help`, etc.) without requiring `tc config`
+
+## [2.1.0]
+
+- `tc init` now embeds a version stamp (`<!-- Technically Correct CLI: vX.Y.Z -->`) in injected content
+- On each `tc` invocation, a warning is printed to stderr if any AI config files contain outdated injected content, prompting `tc init` to refresh
+
+## [2.0.0]
+
+**Breaking changes:**
+
+- Config moved from `~/.technicallycorrect/cli/config.json` to `~/.technicallycorrect/settings.json` (under a `cli` key)
+- `tc i add <identifier> <json>` replaced with named flags: `tc i add <identifier> --repo <repo> --commit <hash> --message <msg> --description <text>`
+- `tc r edit <identifier> <text>` — text argument is now optional; use `--parent` and/or `--design` flags
+- `tc d set` removed — design editing is now part of `tc r edit --design <text>`
+
+**New features:**
+
+- Local `.technicallycorrect/settings.json` for per-repo project default; `tc init <slug>` writes it automatically
+- `--project` resolves from local or global settings — no longer required on every command when configured
+- `tc r list --tree` outputs a nested JSON tree; `--root <identifier>` filters to a subtree
+- `tc r show --include-children` inlines one level of child requirements into the response
+- All list commands (`tc r list`, `tc t list`, `tc p list`) return `{"data": []}` when empty
+
 ## [1.2.7]
 
 - `tc init` now accepts the project slug as a positional argument (`tc init <slug>`) in addition to `--project`
