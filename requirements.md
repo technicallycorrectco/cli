@@ -29,7 +29,7 @@
     - **2.3.3.1** When the task reaches `awaiting_review`, the CLI shall automatically accept the requirement and display the accepted requirement.
 - **2.4** The `tc r edit <identifier>` command shall edit a requirement by identifier.
   - **2.4.1** The `tc r edit` command shall accept an optional text argument, an optional `--parent <identifier>` flag, and an optional `--design <text>` flag.
-  - **2.4.2** At least one of the text argument, `--parent`, or `--design` flags must be provided.
+  - **2.4.2** At least one of the text argument, `--parent`, `--design`, or `--context` flags must be provided.
   - **2.4.3** The `--parent` flag shall move the requirement to the specified parent. The value `0.0` shall move the requirement to root.
   - **2.4.4** The `--design` flag shall set the design text for the requirement in the same invocation.
   - **2.4.5** The CLI shall accept an optional `--context` flag to set the requirement context.

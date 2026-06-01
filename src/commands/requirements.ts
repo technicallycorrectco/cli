@@ -147,12 +147,12 @@ export function requirementsCommand(): Command {
       const org = await resolveOrgSlug();
       const project = resolveProject(options.project);
 
-      if (!text && !options.parent && !options.design) {
-        fail("at least one of text, --parent, or --design is required");
+      if (!text && !options.parent && !options.design && !options.context) {
+        fail("at least one of text, --parent, --design, or --context is required");
       }
 
-      // Apply requirement text / parent change
-      if (text || options.parent) {
+      // Apply requirement text / parent / context change
+      if (text || options.parent || (options.context && !options.design)) {
         const body: Record<string, string | undefined> = {};
         if (text) body.text = text;
         if (options.context) body.context = options.context;
