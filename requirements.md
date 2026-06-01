@@ -26,7 +26,7 @@
   - **2.3.1** The CLI shall accept an optional `--parent` flag specifying a parent identifier when creating a requirement.
   - **2.3.2** The CLI shall accept an optional `--context` flag when creating a requirement.
   - **2.3.3** When a requirement is created, the CLI shall poll the task until it reaches `awaiting_review` or `complete` status.
-    - **2.3.3.1** When the task reaches `awaiting_review`, the CLI shall automatically accept the requirement and display the accepted requirement.
+    - **2.3.3.1** When the task reaches `awaiting_review` or `complete`, the CLI shall display the full task result including the `requirements` array, any text change, and any impact findings.
 - **2.4** The `tc r edit <identifier>` command shall edit a requirement by identifier.
   - **2.4.1** The `tc r edit` command shall accept an optional text argument, an optional `--parent <identifier>` flag, and an optional `--design <text>` flag.
   - **2.4.2** At least one of the text argument, `--parent`, `--design`, or `--context` flags must be provided.
@@ -34,8 +34,8 @@
   - **2.4.4** The `--design` flag shall set the design text for the requirement in the same invocation.
   - **2.4.5** The CLI shall accept an optional `--context` flag to set the requirement context.
   - **2.4.6** When a requirement text edit is submitted, the CLI shall poll the task until it reaches `awaiting_review` or `complete` status.
-    - **2.4.6.1** When the task reaches `awaiting_review` and there are no impact analysis findings, the CLI shall automatically accept the requirement.
-    - **2.4.6.2** When the task reaches `awaiting_review` and there are impact analysis findings, the CLI shall display the task result including all affected requirements and shall not automatically accept.
+    - **2.4.6.1** When the task reaches `awaiting_review`, the CLI shall display the full task result and stop. The caller is responsible for accepting requirements and verifying impacts.
+    - **2.4.6.2** When the task reaches `complete`, the CLI shall proceed to apply any `--design` flag and then display the final requirement.
 - **2.5** The `tc r accept <identifier>` command shall accept a requirement by identifier.
 
 ## 3.0 The CLI shall allow a user to manage tasks.

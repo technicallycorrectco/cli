@@ -123,17 +123,7 @@ export function requirementsCommand(): Command {
       if (error) fail((error as { error: string }).error);
 
       const resolved = await pollTask(org, project, (task as Task).id);
-      const identifier = (resolved.result as { requirement?: { identifier: string } })?.requirement
-        ?.identifier;
-
-      if (!identifier) fail("unexpected task result: missing requirement identifier");
-
-      const { data: accepted, error: acceptError } =
-        await techcorWebApiRequirementsControllerAccept({
-          path: { org_slug: org, project_slug: project, identifier },
-        });
-      if (acceptError) fail((acceptError as { error: string }).error);
-      print(accepted);
+      print(resolved);
     });
 
   cmd
@@ -168,19 +158,8 @@ export function requirementsCommand(): Command {
           const resolved = await pollTask(org, project, (task as Task).id);
 
           if (resolved.status === "awaiting_review") {
-            const impacted = (resolved.result as { impacted?: unknown[] })?.impacted ?? [];
-            if (impacted.length === 0) {
-              const { data: accepted, error: acceptError } =
-                await techcorWebApiRequirementsControllerAccept({
-                  path: { org_slug: org, project_slug: project, identifier },
-                });
-              if (acceptError) fail((acceptError as { error: string }).error);
-            } else {
-              if (!options.design) {
-                print(resolved);
-                return;
-              }
-            }
+            print(resolved);
+            return;
           }
         }
       }

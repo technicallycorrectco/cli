@@ -1,6 +1,6 @@
 {
   "name": "@technicallycorrect/cli",
-  "version": "2.1.5",
+  "version": "2.2.0",
   "description": "Technically Correct CLI",
   "main": "./dist/index.js",
   "bin": {

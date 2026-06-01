@@ -37,11 +37,18 @@ Run \`tc r list --project ${slug}\` before doing anything else. Requirements may
 
 **2. Before any planning or coding — create a requirement**
 
-Run \`tc r create <text> --project ${slug}\` as soon as the user describes a feature, change, or bug fix. The requirement captures *what* must be true, not *how* to build it. Write it in EARS format using modal verbs: "When X, the system shall Y." Create sub-requirements with \`--parent <identifier>\` when a requirement has distinct parts. Run \`tc r list --project ${slug}\` after creating to confirm identifiers and see the updated requirement tree.
+Run \`tc r create <text> --project ${slug}\` as soon as the user describes a feature, change, or bug fix. The requirement captures *what* must be true, not *how* to build it. Write it in EARS format using modal verbs: "When X, the system shall Y." Create sub-requirements with \`--parent <identifier>\` when a requirement has distinct parts.
+
+After \`tc r create\` returns, read the task result carefully:
+- The pipeline may have rewritten the text — compare \`requirements[].text\` to what you submitted and flag significant changes to the user.
+- Check \`requirements[]\` for any entry with \`status: "updated"\` and run \`tc r accept <identifier> --project ${slug}\` for each one. The pipeline may have split the requirement into multiple nodes — accept them all.
+- If \`result.impacted\` is non-empty, show the impacted requirements to the user before proceeding.
+
+Run \`tc r list --project ${slug}\` after all requirements are accepted to confirm identifiers and see the updated tree.
 
 **3. Before writing any code — set a design**
 
-Run \`tc r edit <identifier> --design <text> --project ${slug}\` after agreeing on an approach with the user but before implementing. The design captures *how* you will satisfy the requirement — architecture decisions, data structures, key functions, edge cases. If the command returns an \`impacted\` list, show it to the user and ask for confirmation before proceeding.
+Run \`tc r edit <identifier> --design <text> --project ${slug}\` after agreeing on an approach with the user but before implementing. The design captures *how* you will satisfy the requirement — architecture decisions, data structures, key functions, edge cases.
 
 **4. After each commit — link the implementation**
 
@@ -49,13 +56,18 @@ Run \`tc i add <identifier> --repo <repo> --commit <hash> --message <msg> --desc
 
 Example: \`tc i add 1.0 --repo org/repo --commit abc1234 --message "feat: add handler" --description "Implements the request validation logic from the design" --project ${slug}\`
 
-**5. When edit returns impacts — review before accepting**
+**5. When edit or create returns a task result — always handle it fully**
 
-If \`tc r edit\` returns a result with an \`impacted\` list, show it to the user and ask for confirmation before calling \`tc r accept <identifier> --project ${slug}\` or \`tc t verify <id> --project ${slug}\`. Run \`tc r list --project ${slug}\` after accepting to confirm the updated state.
+Both \`tc r create\` and \`tc r edit\` return a task result after polling. You must:
+1. If \`status\` is \`awaiting_review\` and \`result.impacted\` is non-empty — show impacts to the user and ask for confirmation, then run \`tc t verify <id> --project ${slug}\`.
+2. For every entry in \`requirements[]\` with \`status: "updated"\` — run \`tc r accept <identifier> --project ${slug}\`.
+3. If the pipeline rewrote the text (compare input to \`requirements[].text\`) — flag the change to the user.
+
+Do not proceed to design or implementation until all \`requirements[]\` entries are accepted.
 
 **6. If the user asks you to implement something that conflicts with existing requirements**
 
-You cannot know all conflicts in advance. Trust the impact analysis — if \`tc r edit\` returns impacts, that is the signal to pause. If the user's instruction seems to contradict a requirement you can see in \`tc r list --project ${slug}\`, flag it explicitly and ask whether to update the requirement first.
+You cannot know all conflicts in advance. Trust the impact analysis — if a task result returns \`result.impacted\`, that is the signal to pause. If the user's instruction seems to contradict a requirement you can see in \`tc r list --project ${slug}\`, flag it explicitly and ask whether to update the requirement first.
 
 ### Other commands
 
