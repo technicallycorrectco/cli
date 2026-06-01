@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.1]
+
+- `tc r edit` now always returns the task result (consistent with `tc r create`). Previously it fell through to print the requirement on `complete`, hiding `requirements[]` from the LLM.
+
 ## [2.3.0]
 
 - Updated workflow instructions: single-node pipeline rewrites are accepted silently; only splits (requirements[] > 1 entry) are flagged to the user

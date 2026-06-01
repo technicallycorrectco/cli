@@ -156,11 +156,8 @@ export function requirementsCommand(): Command {
 
         if ((task as Task).id) {
           const resolved = await pollTask(org, project, (task as Task).id);
-
-          if (resolved.status === "awaiting_review") {
-            print(resolved);
-            return;
-          }
+          print(resolved);
+          return;
         }
       }
 
