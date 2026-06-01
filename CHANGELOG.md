@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.3.0]
+
+- Updated workflow instructions: single-node pipeline rewrites are accepted silently; only splits (requirements[] > 1 entry) are flagged to the user
+- Clarified that `result.change` describes what the pipeline did; `requirements[]` is the authoritative list of all requirements produced — use it for status and acceptance, not `result.requirement`
+- Simplified impact/verify decision rule: check `result.impacted` — if non-empty, verify first; otherwise accept all `updated` entries in `requirements[]` directly
+
 ## [2.2.1]
 
 - Fixed missing build step before publish — dist was not rebuilt in 2.2.0

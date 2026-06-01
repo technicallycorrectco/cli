@@ -40,8 +40,9 @@ Run \`tc r list --project ${slug}\` before doing anything else. Requirements may
 Run \`tc r create <text> --project ${slug}\` as soon as the user describes a feature, change, or bug fix. The requirement captures *what* must be true, not *how* to build it. Write it in EARS format using modal verbs: "When X, the system shall Y." Create sub-requirements with \`--parent <identifier>\` when a requirement has distinct parts.
 
 After \`tc r create\` returns, read the task result carefully:
-- The pipeline may have rewritten the text — compare \`requirements[].text\` to what you submitted and flag significant changes to the user.
-- Check \`requirements[]\` for any entry with \`status: "updated"\` and run \`tc r accept <identifier> --project ${slug}\` for each one. The pipeline may have split the requirement into multiple nodes — accept them all.
+- If \`requirements[]\` has more than one entry, the pipeline split the requirement — flag this to the user, show all produced requirements, and confirm before accepting.
+- If \`requirements[]\` has one entry, the pipeline made minor formatting improvements — accept without flagging.
+- For every entry in \`requirements[]\` with \`status: "updated"\`, run \`tc r accept <identifier> --project ${slug}\`.
 - If \`result.impacted\` is non-empty, show the impacted requirements to the user before proceeding.
 
 Run \`tc r list --project ${slug}\` after all requirements are accepted to confirm identifiers and see the updated tree.
@@ -59,9 +60,11 @@ Example: \`tc i add 1.0 --repo org/repo --commit abc1234 --message "feat: add ha
 **5. When edit or create returns a task result — always handle it fully**
 
 Both \`tc r create\` and \`tc r edit\` return a task result after polling. You must:
-1. If \`status\` is \`awaiting_review\` and \`result.impacted\` is non-empty — show impacts to the user and ask for confirmation, then run \`tc t verify <id> --project ${slug}\`.
-2. For every entry in \`requirements[]\` with \`status: "updated"\` — run \`tc r accept <identifier> --project ${slug}\`.
-3. If the pipeline rewrote the text (compare input to \`requirements[].text\`) — flag the change to the user.
+1. If \`requirements[]\` has more than one entry — the pipeline split the requirement. Flag this to the user and show all produced requirements before accepting.
+2. If \`status\` is \`awaiting_review\` and \`result.impacted\` is non-empty — show impacts to the user and ask for confirmation, then run \`tc t verify <id> --project ${slug}\`.
+3. For every entry in \`requirements[]\` with \`status: "updated"\` — run \`tc r accept <identifier> --project ${slug}\`.
+
+Use \`result.change\` to understand what the pipeline did to the edited requirement (original text, reason). Use \`requirements[]\` as the authoritative list of all requirements produced — check status and accept from there, not from \`result.requirement\`.
 
 Do not proceed to design or implementation until all \`requirements[]\` entries are accepted.
 
