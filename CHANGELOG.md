@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.2.1]
+
+- Fixed missing build step before publish — dist was not rebuilt in 2.2.0
+
+## [2.2.0]
+
+- `tc r create` and `tc r edit` no longer auto-accept requirements. Both commands now return the full task result (requirements, text change, impacts) so the calling LLM can review and accept explicitly via `tc r accept <identifier>`
+- Updated `tc init` workflow instructions to guide the LLM through handling the task result: checking for rewritten text, accepting all `updated` requirements, and surfacing impacts to the user
+- `tc r edit --context` now works as a standalone flag without requiring `--text` or `--parent`
+
+## [2.1.5]
+
+- Fixed `tc r edit --context` flag not applying when used without `--text` or `--parent`
+
 ## [2.1.4]
 
 - `tc r list --tree` now excludes rejected requirements from the tree output
