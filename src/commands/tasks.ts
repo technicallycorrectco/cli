@@ -6,7 +6,7 @@ import {
 } from "../client/sdk.gen.js";
 import { resolveOrgSlug } from "../api/index.js";
 import { resolveProject } from "../config/index.js";
-import { print, printList, fail } from "../output.js";
+import { print, printList, fail, failApiError } from "../output.js";
 
 export function tasksCommand(): Command {
   const cmd = new Command("t").description("Manage tasks");
@@ -21,7 +21,7 @@ export function tasksCommand(): Command {
       const { data, error } = await techcorWebApiTasksControllerShow({
         path: { org_slug: org, project_slug: project, id: parseInt(id, 10) },
       });
-      if (error) fail((error as { error: string }).error);
+      if (error) failApiError(error);
       print(data);
     });
   cmd.addCommand(showCmd, { isDefault: true });
@@ -36,7 +36,7 @@ export function tasksCommand(): Command {
       const { data, error } = await techcorWebApiTasksControllerIndex({
         path: { org_slug: org, project_slug: project },
       });
-      if (error) fail((error as { error: string }).error);
+      if (error) failApiError(error);
       printList(data);
     });
 
@@ -50,7 +50,7 @@ export function tasksCommand(): Command {
       const { data, error } = await techcorWebApiTasksControllerVerify({
         path: { org_slug: org, project_slug: project, id: parseInt(id, 10) },
       });
-      if (error) fail((error as { error: string }).error);
+      if (error) failApiError(error);
       print(data);
     });
 

@@ -18,3 +18,9 @@ export function fail(message: string): never {
   process.exit(1);
   throw new Error(message); // unreachable, satisfies TypeScript never
 }
+
+export function failApiError(error: unknown): never {
+  if (error instanceof Error)
+    return fail(`Could not reach the API server — is it running? (${error.message})`);
+  return fail((error as { error?: string } | undefined)?.error ?? "Unknown API error");
+}

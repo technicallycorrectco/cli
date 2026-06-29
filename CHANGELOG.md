@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.2]
+
+- All API errors now output `{"error": "..."}` JSON to stderr — no unhandled exceptions or stack traces
+- Network errors (server unreachable) produce a clear message instead of a misleading token error
+- Added `failApiError` helper used consistently across all commands and the task poller
+- Added tests for clean error output across all commands
+
 ## [2.3.1]
 
 - `tc r edit` now always returns the task result (consistent with `tc r create`). Previously it fell through to print the requirement on `complete`, hiding `requirements[]` from the LLM.

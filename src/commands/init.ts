@@ -5,7 +5,7 @@ import os from "os";
 import { techcorWebApiProjectsControllerIndex } from "../client/sdk.gen.js";
 import { resolveOrgSlug } from "../api/index.js";
 import { saveLocalConfig } from "../config/index.js";
-import { fail } from "../output.js";
+import { fail, failApiError } from "../output.js";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { version } = require("../../package.json") as { version: string };
@@ -168,7 +168,7 @@ export function initCommand(): Command {
         const { data, error } = await techcorWebApiProjectsControllerIndex({
           path: { org_slug: org },
         });
-        if (error) fail((error as { error: string }).error);
+        if (error) failApiError(error);
         const projects = (data as { data: { slug: string; name: string }[] })?.data ?? [];
         if (projects.length === 0) {
           fail("no projects found — create one at technicallycorrect.io");

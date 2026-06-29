@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { techcorWebApiProjectsControllerIndex } from "../client/sdk.gen.js";
 import { resolveOrgSlug } from "../api/index.js";
-import { printList } from "../output.js";
+import { fail, failApiError, printList } from "../output.js";
 
 export function projectsCommand(): Command {
   const cmd = new Command("p").description("Manage projects");
@@ -14,7 +14,7 @@ export function projectsCommand(): Command {
       const { data, error } = await techcorWebApiProjectsControllerIndex({
         path: { org_slug: org },
       });
-      if (error) console.error(error);
+      if (error) failApiError(error);
       printList(data);
     });
 

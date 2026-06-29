@@ -5,7 +5,7 @@ import {
 } from "../client/sdk.gen.js";
 import { resolveOrgSlug } from "../api/index.js";
 import { resolveProject } from "../config/index.js";
-import { print, fail } from "../output.js";
+import { print, fail, failApiError } from "../output.js";
 
 export function implementationsCommand(): Command {
   const cmd = new Command("i").description("Manage implementations");
@@ -37,7 +37,7 @@ export function implementationsCommand(): Command {
         path: { org_slug: org, project_slug: project, identifier },
         body,
       });
-      if (error) fail((error as { error: string }).error);
+      if (error) failApiError(error);
 
       const { data: req, error: reqError } = await techcorWebApiRequirementsControllerShow({
         path: { org_slug: org, project_slug: project, identifier },

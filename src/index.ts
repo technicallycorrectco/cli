@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+process.on("unhandledRejection", (reason) => {
+  const message = reason instanceof Error ? reason.message : String(reason);
+  console.error(JSON.stringify({ error: message }, null, 2));
+  process.exit(1);
+});
+
 import { program } from "commander";
 import { loadConfig, isConfigured } from "./config/index.js";
 

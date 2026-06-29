@@ -1,5 +1,6 @@
 import { techcorWebApiTasksControllerShow } from "../client/sdk.gen.js";
 import type { Task } from "../client/types.gen.js";
+import { failApiError } from "../output.js";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -13,7 +14,7 @@ export async function pollTask(
       path: { org_slug: orgSlug, project_slug: projectSlug, id: taskId },
     });
 
-    if (error) throw new Error((error as { error: string }).error);
+    if (error) failApiError(error);
 
     const task = data as Task;
 

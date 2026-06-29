@@ -10,7 +10,7 @@ import {
 import { resolveOrgSlug } from "../api/index.js";
 import { resolveProject } from "../config/index.js";
 import { pollTask } from "../services/poller.js";
-import { print, printList, fail } from "../output.js";
+import { print, printList, fail, failApiError } from "../output.js";
 import type { Task, Requirement } from "../client/types.gen.js";
 
 type ReqNode = { identifier: string; text: string; status: string; children: ReqNode[] };
@@ -65,7 +65,7 @@ export function requirementsCommand(): Command {
       const { data, error } = await techcorWebApiRequirementsControllerIndex({
         path: { org_slug: org, project_slug: project },
       });
-      if (error) fail((error as { error: string }).error);
+      if (error) failApiError(error);
       if (options.tree) {
         const items = ((data as { data?: Requirement[] })?.data ?? []);
         console.log(JSON.stringify({ data: buildTree(items, options.root) }, null, 2));
@@ -85,7 +85,7 @@ export function requirementsCommand(): Command {
       const { data, error } = await techcorWebApiRequirementsControllerShow({
         path: { org_slug: org, project_slug: project, identifier },
       });
-      if (error) fail((error as { error: string }).error);
+      if (error) failApiError(error);
 
       if (options.includeChildren) {
         const req = data as Requirement & { child_urls?: string[] };
@@ -120,7 +120,7 @@ export function requirementsCommand(): Command {
         path: { org_slug: org, project_slug: project },
         body: { text, parent_identifier: options.parent, context: options.context },
       });
-      if (error) fail((error as { error: string }).error);
+      if (error) failApiError(error);
 
       const resolved = await pollTask(org, project, (task as Task).id);
       print(resolved);
@@ -152,7 +152,7 @@ export function requirementsCommand(): Command {
           path: { org_slug: org, project_slug: project, identifier },
           body,
         });
-        if (error) fail((error as { error: string }).error);
+        if (error) failApiError(error);
 
         if ((task as Task).id) {
           const resolved = await pollTask(org, project, (task as Task).id);
@@ -192,7 +192,7 @@ export function requirementsCommand(): Command {
       const { data, error } = await techcorWebApiRequirementsControllerAccept({
         path: { org_slug: org, project_slug: project, identifier },
       });
-      if (error) fail((error as { error: string }).error);
+      if (error) failApiError(error);
       print(data as Requirement);
     });
 
