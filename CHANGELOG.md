@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.3]
+
+- Added GitHub Actions workflow to automatically publish to npm on commit via trusted publisher
+
 ## [2.3.2]
 
 - All API errors now output `{"error": "..."}` JSON to stderr — no unhandled exceptions or stack traces
