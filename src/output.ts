@@ -13,8 +13,10 @@ export function printList(data: unknown): void {
   console.log(JSON.stringify(result, null, 2));
 }
 
+const isInteractive = !!process.stderr.isTTY;
+
 export function fail(message: string): never {
-  console.error(JSON.stringify({ error: message }, null, 2));
+  console.error(isInteractive ? message : JSON.stringify({ error: message }, null, 2));
   process.exit(1);
   throw new Error(message); // unreachable, satisfies TypeScript never
 }

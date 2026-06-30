@@ -1,8 +1,8 @@
 #!/usr/bin/env node
+import { fail } from "./output.js";
 process.on("unhandledRejection", (reason) => {
   const message = reason instanceof Error ? reason.message : String(reason);
-  console.error(JSON.stringify({ error: message }, null, 2));
-  process.exit(1);
+  fail(message);
 });
 
 import { program } from "commander";
@@ -33,8 +33,7 @@ const skipConfigCheck =
   args.includes("--version");
 
 if (!skipConfigCheck && !isConfigured(config)) {
-  console.error("tc is not configured. Run `tc config` to set your API key");
-  process.exit(1);
+  fail("tc is not configured. Run `tc config` to set your API key");
 }
 
 initClient(config);

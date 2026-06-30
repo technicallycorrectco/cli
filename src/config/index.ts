@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { fail } from "../output.js";
 
 export type Config = {
   host: string;
@@ -73,8 +74,7 @@ export function resolveProject(flagValue: string | undefined): string {
   if (flagValue) return flagValue;
   const config = loadConfig();
   if (config.project) return config.project;
-  console.error(JSON.stringify({ error: "--project is required" }, null, 2));
-  process.exit(1);
+  fail("--project is required");
 }
 
 export function getBaseUrl(config: Config): string {
