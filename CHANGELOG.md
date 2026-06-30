@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.0]
+
+- Error output is now TTY-aware: plain text for humans in a terminal, JSON for LLMs capturing output
+
 ## [2.3.3]
 
 - Added GitHub Actions workflow to automatically publish to npm on commit via trusted publisher
