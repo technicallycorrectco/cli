@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { techcorWebApiProjectsControllerIndex } from "../client/sdk.gen.js";
 import { resolveOrgSlug } from "../api/index.js";
-import { fail, failApiError, printList } from "../output.js";
+import { failApiError, printList } from "../output.js";
 
 export function projectsCommand(): Command {
   const cmd = new Command("p").description("Manage projects");

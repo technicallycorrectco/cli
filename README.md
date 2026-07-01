@@ -55,7 +55,7 @@ tc i add <identifier> --repo <repo> --commit <hash> --message <msg> --project <s
 tc i add <identifier> --repo <repo> --commit <hash> --message <msg> --description <text> --project <slug>
 ```
 
-Links a git commit to a requirement. `--repo`, `--commit`, and `--message` are required. `--description` is optional but recommended.
+Links a git commit to a requirement. `--repo`, `--commit`, and `--message` are required. `--description` is optional but recommended — use it to explain what aspect of the requirement the commit addresses.
 
 ### Tasks
 
@@ -74,6 +74,10 @@ tc p list    # list all projects in your organization
 ## Async operations
 
 `tc r create` and `tc r edit` (when text is provided) are asynchronous — the CLI polls until the operation completes and returns the final result. If the AI detects impact on related requirements, the result is returned for review without auto-accepting.
+
+## Output format
+
+All commands write JSON to stdout. When stdout is a terminal the output is pretty-printed; when captured by a script or LLM it is compact JSON on a single line. Errors are written to stderr as `{"error": "..."}` and exit non-zero.
 
 ## Stale AI config warning
 

@@ -5,7 +5,7 @@ import { fail } from "../output.js";
 test("fail() writes JSON error to stderr", (t) => {
   const captured: string[] = [];
   t.mock.method(console, "error", (msg: string) => captured.push(msg));
-  t.mock.method(process, "exit", (_code: number) => {});
+  t.mock.method(process, "exit", () => undefined);
 
   try {
     fail("something went wrong");

@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.1]
+
+- Updated README: added output format section (JSON/TTY behaviour), updated `--description` note on `tc i add`
+
 ## [3.0.0]
 
 - Error output is now TTY-aware: plain text for humans in a terminal, JSON for LLMs capturing output

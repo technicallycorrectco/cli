@@ -6,7 +6,7 @@ import {
 } from "../client/sdk.gen.js";
 import { resolveOrgSlug } from "../api/index.js";
 import { resolveProject } from "../config/index.js";
-import { print, printList, fail, failApiError } from "../output.js";
+import { print, printList, failApiError } from "../output.js";
 
 export function tasksCommand(): Command {
   const cmd = new Command("t").description("Manage tasks");
